@@ -1,0 +1,12 @@
+.filter {
+  padding: 1em;
+  background: #000;
+  color: #FFF;
+}
+.filter select {
+  margin: 0 2em 0 0;
+}
+.filter label {
+  margin: 0 .5em 0 0;
+  text-transform: capitalize;
+}
