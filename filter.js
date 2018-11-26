@@ -1,37 +1,40 @@
-function initFilters( elList, strClass, onFilterFunc ){
-  elList.before("<div class='" + strClass + "'><button class='" + strClass + "__btn'>Go</button></div>")
-
+function initFilters( elList, strClass, onPreFilterCheck, onPostFilterCheck ){
+  elList.before("<div class='" + strClass + "'><label>Filter</label><div class='" + strClass + "__options'></div><button class='" + strClass + "__btn'>GO</button></div>")
   var $items = elList.children(),
-      arrFilters = []
+    arrFilters = []
 
   $items.each(function(){
     var objData = $(this).data()
     for (var key in objData) {
-      if ( (!arrFilters.includes(key)) && key != "" ){
-				arrFilters.push(key)
-			}
+      if ( key.includes("filter") && (!arrFilters.includes(key)) && key != "" ){
+        arrFilters.push(key)
+      }
     }
   })
   for (var i = 0; i < arrFilters.length; i++) {
     var eachFilter = arrFilters[i],
-        arrFilterOptions = []
-    $('.' + strClass).prepend("<label>" + eachFilter.replace("filter", "") + "</label><select class='" + strClass + "__select " + strClass + "__select--" + eachFilter + "' data-filter='" + eachFilter + "'><option value=''>All</option></select>")
+    arrFilterOptions = []
+    $('.' + strClass + '__options').prepend("<select class='" + strClass + "__select " + strClass + "__select--" + eachFilter + "' data-filter='" + eachFilter + "'><option value=''>Select " + eachFilter.replace("filter", "").replace("_", " ") + "</option><option value=''>All</option></select>")
     $items.each(function(){
       var strFilterVal = $(this).attr('data-' + eachFilter)
       if ( !arrFilterOptions.includes(strFilterVal) && strFilterVal != undefined ){
-				arrFilterOptions.push(strFilterVal)
-			}
+        arrFilterOptions.push(strFilterVal)
+      }
     })
     for (var j = 0; j < arrFilterOptions.length; j++) {
-      $("." + strClass + "__select--" + eachFilter).append("<option value='" + arrFilterOptions[j] + "'>" + arrFilterOptions[j] + "</option>")
-    }
-	}
+      var strOptionVal = arrFilterOptions[j]
+      strOptionVal != "" && $("." + strClass + "__select--" + eachFilter).append("<option value='" + arrFilterOptions[j] + "'>" + arrFilterOptions[j] + "</option>")
+    } 
+  }
 
   $("." + strClass + "__btn").on("click", function(){
-    runFilterCheck(function(){
-      onFilterFunc()
+    onPreFilterCheck(function(){
+      runFilterCheck(function(){
+        onPostFilterCheck()
+      })
     })
   })
+  onPostFilterCheck()
 
   function runFilterCheck(callback){
     $items.hide().removeClass('active')
@@ -49,4 +52,6 @@ function initFilters( elList, strClass, onFilterFunc ){
   }
 }
 
-initFilters($('.list'), "filter", function(){})
+initFilters( $('.list'), "filter", function(callback){
+  callback()
+}, function(){})
